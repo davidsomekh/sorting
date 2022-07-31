@@ -1,20 +1,57 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from "react";
+import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import DraggableFlatList, {
+  ScaleDecorator,
+  RenderItemParams,
+} from "react-native-draggable-flatlist";
 
-export default function App() {
+import { mapIndexToData, Item } from './utils'
+
+const NUM_ITEMS = 10;
+
+const initialData: Item[] = [...Array(NUM_ITEMS)].map(mapIndexToData);
+
+export default function Basic() {
+  const [data, setData] = useState(initialData);
+
+  const renderItem = ({ item, drag, isActive }: RenderItemParams<Item>) => {
+    return (
+      <ScaleDecorator>
+        <TouchableOpacity
+          activeOpacity={1}
+          onLongPress={drag}
+          disabled={isActive}
+          style={[
+            styles.rowItem,
+            { backgroundColor: isActive ? "red" : item.backgroundColor },
+          ]}
+        >
+          <Text style={styles.text}>{item.text}</Text>
+        </TouchableOpacity>
+      </ScaleDecorator>
+    );
+  };
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <DraggableFlatList
+      data={data}
+      onDragEnd={({ data }) => setData(data)}
+      keyExtractor={(item) => item.key}
+      renderItem={renderItem}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+  rowItem: {
+    height: 100,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  text: {
+    color: "white",
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
